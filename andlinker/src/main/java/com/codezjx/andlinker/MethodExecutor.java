@@ -42,7 +42,11 @@ final class MethodExecutor {
             throwable = e;
         }
         if (throwable != null) {
-            resultMsg = "Exception occur when execute method:" + mMethod.getName() + '\n' + throwable.getMessage();
+            String cause = throwable.getCause() != null ? throwable.getCause().toString() : "";
+            resultMsg = "Exception occur when execute method: " + mMethod.getName() + "\n Cause: " + cause;
+            if (Logger.sEnable) {
+                throwable.printStackTrace();
+            }
         }
         return new Response(statusCode, resultMsg, result);
     }
