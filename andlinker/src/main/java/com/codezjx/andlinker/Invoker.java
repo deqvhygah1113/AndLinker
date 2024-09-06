@@ -56,7 +56,7 @@ final class Invoker {
         }
         // Cache all annotation method
         String clsName = clazz.getSimpleName();
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             // The compiler sometimes creates synthetic bridge methods as part of the
             // type erasure process. As of JDK8 these methods now include the same
@@ -66,12 +66,13 @@ final class Invoker {
                 continue;
             }
             String methodName = method.getName();
-            String key = createMethodExecutorKey(clsName, methodName);
+            String methodClsName = method.getDeclaringClass().getSimpleName();
+            String key = createMethodExecutorKey(Utils.createClsName(clsName, methodClsName), methodName);
             if (isRegister) {
                 MethodExecutor executor = new MethodExecutor(target, method);
                 MethodExecutor preExecutor = mMethodExecutors.putIfAbsent(key, executor);
                 if (preExecutor != null) {
-                    throw new IllegalStateException("Key conflict with class:" + clsName + " method:" + methodName
+                    throw new IllegalStateException("Key conflict with key:" + key + " method:" + methodName
                             + ". Please try another class/method name.");
                 }
             } else {
@@ -153,7 +154,8 @@ final class Invoker {
                             if (cookiePid == pid) {
                                 try {
                                     Type[] parameterTypes = method.getGenericParameterTypes();
-                                    Request request = createCallbackRequest(service.getSimpleName(), method.getName(), args, parameterTypes);
+                                    String clsName = Utils.createClsName(service.getSimpleName(), method.getDeclaringClass().getSimpleName());
+                                    Request request = createCallbackRequest(clsName, method.getName(), args, parameterTypes);
                                     Response response = mCallbackList.getBroadcastItem(i).callback(request);
                                     result = response.getResult();
                                     if (response.getStatusCode() != Response.STATUS_CODE_SUCCESS) {

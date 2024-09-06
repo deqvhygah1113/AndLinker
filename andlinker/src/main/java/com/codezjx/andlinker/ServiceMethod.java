@@ -66,9 +66,10 @@ final class ServiceMethod {
         private boolean mOneWay = false;
         private ParameterHandler<?>[] mParameterHandlers;
 
-        Builder(AndLinker linker, Method method) {
+        Builder(AndLinker linker, Method method, String clsName) {
             mLinker = linker;
             mMethod = method;
+            mClassName = clsName;
             mMethodAnnotations = method.getAnnotations();
             mParameterAnnotationsArray = method.getParameterAnnotations();
             mParameterTypes = method.getGenericParameterTypes();
@@ -76,7 +77,8 @@ final class ServiceMethod {
         
         ServiceMethod build() {
             mCallAdapter = createCallAdapter();
-            mClassName = mMethod.getDeclaringClass().getSimpleName();
+            String methodClsName = mMethod.getDeclaringClass().getSimpleName();
+            mClassName = Utils.createClsName(mClassName, methodClsName);
             mMethodName = mMethod.getName();
 
             for (Annotation annotation : mMethodAnnotations) {

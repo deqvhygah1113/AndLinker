@@ -69,7 +69,7 @@ public final class AndLinker {
                         if (method.getDeclaringClass() == Object.class) {
                             return method.invoke(this, args);
                         }
-                        ServiceMethod serviceMethod = loadServiceMethod(method);
+                        ServiceMethod serviceMethod = loadServiceMethod(method, service.getSimpleName());
                         RemoteCall remoteCall = new RemoteCall(mTransferService, serviceMethod, args, mDispatcher);
                         return serviceMethod.getCallAdapter().adapt(remoteCall);
                     }
@@ -211,7 +211,7 @@ public final class AndLinker {
         };
     }
     
-    private ServiceMethod loadServiceMethod(Method method) {
+    private ServiceMethod loadServiceMethod(Method method, String clsName) {
         ServiceMethod result = serviceMethodCache.get(method);
         if (result != null) {
             return result;
@@ -220,7 +220,7 @@ public final class AndLinker {
         synchronized (serviceMethodCache) {
             result = serviceMethodCache.get(method);
             if (result == null) {
-                result = new ServiceMethod.Builder(this, method).build();
+                result = new ServiceMethod.Builder(this, method, clsName).build();
                 serviceMethodCache.put(method, result);
             }
         }
