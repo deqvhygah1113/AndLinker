@@ -6,9 +6,9 @@ import com.codezjx.andlinker.annotation.RemoteInterface;
  * Created by codezjx on 2018/3/13.<br/>
  */
 @RemoteInterface
-public interface IRemoteCallback {
+public interface IRemoteCallback extends IBaseCallback {
 
-    void onStart();
+    void onStart(String status);
 
     void onValueChange(int value);
 }

@@ -56,6 +56,7 @@ public class BindingActivity extends AppCompatActivity implements AndLinker.Bind
     public void onBind() {
         Log.d(TAG, "AndLinker onBind()");
         mRemoteService = mLinker.create(IRemoteService.class);
+        mRemoteService.init("msg from client");
         mRemoteTask = mLinker.create(IRemoteTask.class);
     }
 
@@ -138,8 +139,13 @@ public class BindingActivity extends AppCompatActivity implements AndLinker.Bind
     private final IRemoteCallback mRemoteCallback = new IRemoteCallback() {
         
         @Override
-        public void onStart() {
-            Log.d(TAG, "Server callback onStart!");
+        public void onInit(String msg) {
+            Log.d(TAG, "Server callback onInit msg:" + msg);
+        }
+
+        @Override
+        public void onStart(String status) {
+            Log.d(TAG, "Server callback onStart status:" + status);
         }
 
         @Override

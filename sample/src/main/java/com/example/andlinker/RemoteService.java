@@ -47,6 +47,11 @@ public class RemoteService extends Service {
     private final IRemoteService mRemoteService = new IRemoteService() {
 
         @Override
+        public void init(String msg) {
+            Log.d(TAG, "Call init() in server: " + msg);
+        }
+
+        @Override
         public int getPid() {
             return android.os.Process.myPid();
         }
@@ -61,7 +66,8 @@ public class RemoteService extends Service {
 
         @Override
         public void registerCallback(IRemoteCallback callback) {
-            callback.onStart();
+            callback.onInit("Message from server.");
+            callback.onStart(null);
             callback.onValueChange(1234);
         }
 

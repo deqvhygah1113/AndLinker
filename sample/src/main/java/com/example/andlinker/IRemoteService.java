@@ -13,7 +13,7 @@ import com.codezjx.andlinker.annotation.RemoteInterface;
  * Created by codezjx on 2018/3/12.<br/>
  */
 @RemoteInterface
-public interface IRemoteService {
+public interface IRemoteService extends IBaseService {
 
     int getPid();
 
