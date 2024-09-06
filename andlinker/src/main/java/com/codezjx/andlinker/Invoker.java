@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -151,7 +152,8 @@ final class Invoker {
                             int cookiePid = (int) mCallbackList.getBroadcastCookie(i);
                             if (cookiePid == pid) {
                                 try {
-                                    Request request = createCallbackRequest(service.getSimpleName(), method.getName(), args);
+                                    Type[] parameterTypes = method.getGenericParameterTypes();
+                                    Request request = createCallbackRequest(service.getSimpleName(), method.getName(), args, parameterTypes);
                                     Response response = mCallbackList.getBroadcastItem(i).callback(request);
                                     result = response.getResult();
                                     if (response.getStatusCode() != Response.STATUS_CODE_SUCCESS) {
@@ -169,11 +171,12 @@ final class Invoker {
                 });
     }
 
-    private Request createCallbackRequest(String targetClass, String methodName, Object[] args) {
+    private Request createCallbackRequest(String targetClass, String methodName, Object[] args, Type[] parameterTypes) {
         int argsLength = args != null ? args.length : 0;
         BaseTypeWrapper[] wrappers = new BaseTypeWrapper[argsLength];
         for (int i = 0; i < argsLength; i++) {
-            wrappers[i] = new InTypeWrapper(args[i], args[i].getClass());
+            Class<?> rawParameterType = Utils.getRawType(parameterTypes[i]);
+            wrappers[i] = new InTypeWrapper(args[i], rawParameterType);
         }
         return new Request(targetClass, methodName, wrappers);
     }
